@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id String @id @default(uuid())
+  nome_usuario String @unique
+  email String @unique
+  senha_hash String
+  ativo Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  senhas SenhaGerada[]
+}
+
+model TipoSenha {
+  id String @id @default(uuid())
+  nome Tipos
+  descricao String
+  caracteres_permitidos Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  senhas SenhaGerada[]
+}
+
+model SenhaGerada {
+  id String @id @default(uuid())
+  usuario_id String
+  tipo_id String
+  senha_criptografada String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  tipo TipoSenha @relation(fields: [tipo_id], references: [id])
+
+  @@index([usuario_id])
+  @@index([tipo_id])
+  @@index([createdAt])
+}
